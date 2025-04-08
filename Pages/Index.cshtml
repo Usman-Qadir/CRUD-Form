@@ -1,0 +1,358 @@
+﻿@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Home page";
+}
+
+<style>
+    body {
+        background-color: blue;
+        background-image: url(https://images.unsplash.com/photo-1526256262350-7da7584cf5eb?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D);
+    }
+
+    .card-header {
+        width: 100%;
+        background-color: #0a4a5b;
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 2px;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+
+    .form-control, .form-select {
+        border-radius: 10px;
+        border: 1px solid none;
+        height: 30px;
+    }
+
+        .form-control:focus, .form-select:focus {
+            border: 1px solid red;
+            box-shadow: 0 0 5px red;
+        }
+</style>
+
+<div>
+    <div class="card">
+        <div class="card-header">
+            <h3 class=" section-header ">Basic Information</h3>
+            <i class="fa-solid fa-minus fa-lg"></i>
+        </div>
+
+        <div class="card-body">
+            <form method="post" id="form1">
+               
+                <fieldset class="mb-2">
+                    <div class="row">
+                        <h6 class="col-md-1 mb-3">Name</h6>
+                        <div class="col-md-3 mb-3">
+                            <input type="text" class="form-control" id="firstName" min="3" pattern="[A-Za-z]+" title="Only Alphabets and spaces allowed" placeholder="Patient's First Name" required>
+                            <div class="error-message" id="firstNameError"></div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <input type="text" class="form-control" id="middleName" pattern="[A-Za-z ]*" title="Only alphabets and spaces allowed" placeholder="Patient's Middle Name">
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <input type="text" class="form-control" id="lastName" pattern="[A-Za-z ]+" title="Only alphabets and spaces allowed" placeholder="Patient's Last Name" required>
+                            <div class="error-message" id="lastNameError"></div>
+                        </div>
+                    </div>
+                </fieldset>
+             
+
+                <fieldset class="mb-2">
+                    <div class="row">
+                        <h6 class="col-md-1 mb-3">Relation</h6>
+                        <div class="col-md-3 mb-3">
+                            <select class="form-select">
+                                <option value=""></option>
+                                <option>Mother</option>
+                                <option>Father</option>
+                                <option>Brother</option>
+                                <option>Sister</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <input type="text" class="form-control" placeholder="Relation's First Name" required>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <input type="text" class="form-control" placeholder="Relation's Last Name" required>
+                        </div>
+						
+                    </div>
+                </fieldset>
+
+
+                
+                <fieldset class="mb-1">
+                    <div class="row">
+                        <h6 class="col-md-1 mb-3">Gender</h6>
+                        <div class="col-md-1 mb-3">
+                            <select class="form-select">
+                                <option value=""></option>
+                                <option>Male</option>
+                                <option>Female</option>
+                                <option>Other</option>
+                            </select>
+                        </div>
+                        <h6 class="col-md-1 mb-3">DOB</h6>
+                        <div class="col-md-2 mb-3">
+                            <input type="date" class="form-control" id="DOB" required>
+                            <div class="error-message" id="dobError"></div>
+                        </div>
+                        <h6 class="col-md-1 mb-3">Age</h6>
+                        <div class="col-md-1 mb-3">
+                            <input type="text" class="form-control" id="ageMonth" placeholder="Month">
+                        </div>
+                        <div class="col-md-1 mb-3">
+                            <input type="text" class="form-control" id="ageDay" placeholder="Day" >
+                        </div>
+                        
+                        <div class="col-md-1 mb-3">
+                            <input type="text" class="form-control" id="ageYear" placeholder="Year" >
+                        </div>
+                        <h6 class="col-md-1 mb-3">Spousal</h6>
+                        <div class="col-md-2 mb-3">
+                            <select class="form-select">
+                                <option value=""></option>
+                                <option>Yes</option>
+                                <option>No</option>
+                            </select>
+                        </div>
+                    </div>
+                </fieldset>
+
+                <fieldset>
+                    <div class="row">
+                        <h6 class="col-md-1">CNIC</h6>
+						<div class="col-md-2 mb-3">
+							<input type="text" class="form-control" id="cnic" title="Format: 1234512345671" placeholder="XXXXXXXXXXXXX" required>
+							<div class="error-message" id="cnicError"></div>
+                        </div>
+						<h6 class="col-md-1">Owner</h6>
+                        <div class="col-md-2">
+							<select class="form-select">
+								<option value=""></option>
+								<option>Self</option>
+								<option>Father</option>
+								<option>Mother</option>
+								
+							</select>
+                        </div>
+						<h6 class="col-md-1">Cell#</h6>
+						<div class="col-md-2 mb-3">
+							<input type="text" class="form-control" id="cellNumber"  title="Format: 1234-1234567" placeholder="XXXX-XXXXXXX" required>
+							<div class="error-message" id="cellNumberError"></div>
+						</div>
+                        <h6 class="col-md-1">Cell Owner</h6>
+                        <div class="col-md-2 mb-3">
+                            <input type="text" class="form-control" id="cellOwner"   required>
+                            <div class="error-message" id="cellOwnerError"></div>
+                        </div>
+
+                    </div>
+                </fieldset>
+
+
+                <div class="col-12">
+                    <button class="btn btn-primary" type="submit">Submit form</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+
+
+@section Scripts {
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function () {
+
+            // 1️⃣ Toggle Card Body (Collapse/Expand)
+            $(".card-header").click(function () {
+                $(".card-body").slideToggle();
+                $(this).find("i").toggleClass("fa-minus fa-plus");
+            });
+
+            // 2️⃣ Function to calculate age from DOB
+            function calculateAgeFromDOB(dob) {
+                let birthDate = new Date(dob);
+                let today = new Date();
+
+                let years = today.getFullYear() - birthDate.getFullYear();
+                let months = today.getMonth() - birthDate.getMonth();
+                let days = today.getDate() - birthDate.getDate();
+
+                if (days < 0) { 
+                    months--;
+                    days += new Date(today.getFullYear(), today.getMonth(), 0).getDate();
+                }
+                if (months < 0) {
+                    years--;
+                    months += 12;
+                }
+
+                $("#ageYear").val(years);
+                $("#ageMonth").val(months);
+                $("#ageDay").val(days);
+            }
+
+            // 3️⃣ Function to calculate DOB from Age
+            function calculateDOBFromAge() {
+                let years = parseInt($("#ageYear").val()) || 0;
+                let months = parseInt($("#ageMonth").val()) || 0;
+                let days = parseInt($("#ageDay").val()) || 0;
+
+                let today = new Date();
+                let dob = new Date(today);
+
+                dob.setFullYear(dob.getFullYear() - years);
+                dob.setMonth(dob.getMonth() - months);
+                dob.setDate(dob.getDate() - days);
+
+                let dobFormatted = dob.toISOString().split("T")[0];
+                $("#DOB").val(dobFormatted);
+            }
+
+            // When DOB changes, update Age fields
+            $("#DOB").change(function () {
+                calculateAgeFromDOB($(this).val());
+            });
+
+            // 5 When Age fields change, update DOB
+            $("#ageYear, #ageMonth, #ageDay").on("input", function () {
+                calculateDOBFromAge();
+
+            });
+
+                    // Enhanced Name Validation Function
+        function validateNameInput(inputField, errorField) {
+            let value = $(inputField).val();
+            let namePattern = /^[A-Za-z ]+$/;
+
+            // Remove any non-alphabet characters
+            let cleanedValue = value.replace(/[^A-Za-z ]/g, '');
+            $(inputField).val(cleanedValue);
+
+            // Capitalize first letter of each word
+            if (cleanedValue.length > 0) {
+                let capitalized = cleanedValue.toLowerCase()
+                    .split(' ')
+                    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+                    .join(' ');
+                $(inputField).val(capitalized);
+            }
+
+           
+        }
+
+        // Apply to all name fields
+        $("#firstName, #middleName, #lastName").on("input", function() {
+            validateNameInput(this, `#${$(this).attr("id")}Error`);
+        });
+
+
+
+        //  Live Validation for CNIC (Pure 13 digits, no dashes)
+        $("#cnic").on("input", function() {
+            // Remove any non-digit characters
+            let rawValue = $(this).val().replace(/\D/g, '');
+
+            // Limit to 13 digits
+            if (rawValue.length > 13) {
+                rawValue = rawValue.substring(0, 13);
+            }
+
+            // Update the field with digits only
+            $(this).val(rawValue);
+
+            // Validate length
+            if (rawValue.length !== 13) {
+                $("#cnicError").text("CNIC must be exactly 13 digits").css("color", "red");
+            } else {
+                $("#cnicError").text("");
+            }
+        });
+
+
+           // Live Validation for Cell Number (Pure 11 digits starting with 03, no dashes)
+        $("#cellNumber").on("input", function() {
+            // Remove any non-digit characters
+            let rawValue = $(this).val().replace(/\D-/g, '');
+
+            // Limit to 11 digits
+            if (rawValue.length > 11) {
+                rawValue = rawValue.substring(0, 11);
+            }
+
+            // Update the field with digits only
+            $(this).val(rawValue);
+
+            // Validate length and prefix
+            if (rawValue.length !== 11) {
+                $("#cellNumberError").text("Cell number must be exactly 11 digits").css("color", "red");
+            } else if (!rawValue.startsWith('03')) {
+                $("#cellNumberError").text("Must start with 03").css("color", "red");
+            } else {
+                $("#cellNumberError").text("");
+            }
+        });
+
+            //  Prevent Form Submission if Errors Exist
+            $("form").submit(function (event) {
+                let hasError = $(".error-message").text().trim() !== "";
+                if (hasError) {
+                    alert("Please fix errors before submitting!");
+                    event.preventDefault();
+                }
+            });
+        });
+
+                       $("#form1").on("submit", function (event) {
+            event.preventDefault();
+
+            let isValid = true;
+            $(".error-message").each(function () {
+                if ($(this).text().trim() !== "") {
+                    isValid = false;
+                }
+            });
+
+            if (isValid) {
+                // ✅ Collect form values
+                const formData = {
+                    firstName: $("#firstName").val(),
+                    middleName: $("#middleName").val(),
+                    lastName: $("#lastName").val(),
+                    cnic: $("#cnic").val(),
+                    cellNumber: $("#cellNumber").val(),
+                    cellOwner: $("#cellOwner").val(),
+                    dob: $("#DOB").val()
+                };
+
+                // 🔄 Convert to JSON string
+                const jsonString = JSON.stringify(formData, null, 4); // pretty print with 4 spaces
+
+                // 📦 Create Blob and download link
+                const blob = new Blob([jsonString], { type: "application/json" });
+                const link = document.createElement("a");
+                link.href = URL.createObjectURL(blob);
+                link.download = "form-data.json"; // name of the file
+                link.click();
+
+                alert("Form data saved as JSON.");
+            } else {
+                alert("Please fix the errors before submitting.");
+            }
+        });
+
+
+    </script>
+}
+
+
+         
