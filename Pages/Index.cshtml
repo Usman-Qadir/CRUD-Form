@@ -22,6 +22,12 @@
         cursor: pointer;
     }
 
+    .tb-header{
+        background-color: #0a4a5b;
+    }
+
+
+
     .form-control, .form-select {
         border-radius: 10px;
 
@@ -74,10 +80,10 @@
                             </select>
                         </div>
                         <div class="col-md-3 mb-3">
-                            <input type="text" class="form-control" placeholder="Relation's First Name" required>
+                            <input type="text" class="form-control" id="relFirstName" placeholder="Relation's First Name" required>
                         </div>
                         <div class="col-md-3 mb-3">
-                            <input type="text" class="form-control" placeholder="Relation's Last Name" required>
+                            <input type="text" class="form-control" id=" relLastName" placeholder="Relation's Last Name" required>
                         </div>
 
                     </div>
@@ -173,11 +179,60 @@
                 <div class="col-6">
                     <button class="btn btn-primary" type="submit">Submit form</button>
                     <button class="btn btn-primary" type="button" id="downloadJsonBtn">Download JSON</button>
+					<button class="btn btn-primary" type="button" id="updateFormBtn">Update Record</button>
+					
                 </div>
 
+
+
+        
             </form>
         </div>
     </div>
+
+    <!------ Table  --->
+
+    <table class = "table table-bordered mt-5 table-light table-responsive ">
+        <thead class="table-light">
+            <tr>
+                <th colspan="8" class="text-center tb-header">Patient's Information</th>
+            </tr>
+            <tr>
+                <th>ID</th>
+                <th>First Name</th>
+                <th>Last Name</th>
+                <th>CNIC</th>
+                <th>Department</th>
+                <th>DOB</th>
+                <th>Contact</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody id="formEntriesTableBody"></tbody>
+
+    <tr>
+        <td></td>
+			<td></td>
+			<td></td>
+			<td></td>
+			<td></td>
+            <td></td>
+            <td></td>
+			<td>
+				
+    </tr>
+    </table>
+
+
+
+
+
+
+
+
+
+
+
 </div>
 
 
@@ -186,11 +241,13 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
         $(document).ready(function () {
+            // Toggle form section
             $(".card-header").click(function () {
                 $(".card-body").slideToggle();
                 $(this).find("i").toggleClass("fa-minus fa-plus");
             });
 
+            // Auto-calculate age from DOB
             function calculateAgeFromDOB(dob) {
                 let birthDate = new Date(dob);
                 let today = new Date();
@@ -212,6 +269,7 @@
                 $("#ageDay").val(days);
             }
 
+            // Auto-calculate DOB from age
             function calculateDOBFromAge() {
                 let years = parseInt($("#ageYear").val()) || 0;
                 let months = parseInt($("#ageMonth").val()) || 0;
@@ -227,6 +285,7 @@
                 $("#DOB").val(dob.toISOString().split("T")[0]);
             }
 
+            // Input handlers for DOB/age
             $("#DOB").change(function () {
                 calculateAgeFromDOB($(this).val());
             });
@@ -235,6 +294,7 @@
                 calculateDOBFromAge();
             });
 
+            // Capitalize and validate name inputs
             function validateNameInput(inputField, errorField) {
                 let value = $(inputField).val();
                 let cleanedValue = value.replace(/[^A-Za-z ]/g, '');
@@ -250,9 +310,10 @@
             }
 
             $("#firstName, #middleName, #lastName").on("input", function () {
-                validateNameInput(this, `#${$(this).attr("id")}Error`);
+                validateNameInput(this, "#" + $(this).attr("id") + "Error");
             });
 
+            // CNIC formatting and validation
             $("#cnic").on("input", function () {
                 let rawValue = $(this).val().replace(/\D/g, '');
                 rawValue = rawValue.substring(0, 13);
@@ -263,6 +324,7 @@
                 ).css("color", "red");
             });
 
+            // Cell number formatting and validation
             $("#cellNumber").on("input", function () {
                 let rawValue = $(this).val().replace(/\D/g, '');
                 rawValue = rawValue.substring(0, 11);
@@ -277,71 +339,165 @@
                 }
             });
 
+            // Main submit functionality
+            $("#form1").on("submit", function (event) {
+                event.preventDefault();
 
+                let hasErrors = $(".error-message").toArray().some(el => $(el).text().trim() !== "");
+                if (hasErrors) {
+                    alert("Please fix the errors before submitting.");
+                    return;
+                }
 
-                    //  Form submission handler
-        $("#form1").on("submit", function (event) {
-            event.preventDefault(); // Prevent default form submission
+                const formData = {
+                    firstName: $("#firstName").val(),
+                    middleName: $("#middleName").val(),
+                    lastName: $("#lastName").val(),
+					Relation:$("#relation").val(),
+					RelativeFirstName: $("#relFirstName").val(),
+					RelativeLastName: $("#relLastName").val(),
+                    cnic: $("#cnic").val(),
+                    cellNumber: $("#cellNumber").val(),
+                    cellOwner: $("#cellOwner").val(),
+                    dob: $("#DOB").val(),
+                    department: $("#department").val()
+                };
 
-            //  Check if there are any visible validation errors
-            let hasErrors = $(".error-message").toArray().some(el => $(el).text().trim() !== "");
-            if (hasErrors) {
-                alert("Please fix the errors before submitting.");
-                return; // Exit if there are validation errors
-            }
+                const key = `${formData.cnic}`;
+                let existingData = JSON.parse(localStorage.getItem("formEntries")) || {};
 
-            //  Collect form field values into an object
-            const formData = {
-                firstName: $("#firstName").val(),
-                middleName: $("#middleName").val(),
-                lastName: $("#lastName").val(),
-                cnic: $("#cnic").val(),
-                cellNumber: $("#cellNumber").val(),
-                cellOwner: $("#cellOwner").val(),
-                dob: $("#DOB").val(),
-                department: $("#department").val()
-            };
+                //  Check for duplicate CNIC
+                if (existingData[key]) {
+                    alert("Record with same CNIC and department already exists. Use 'Update Record' if you want to update it.");
+                    return;
+                }
 
-            //  Create a unique key using CNIC and department
-            const key = `${formData.cnic}_${formData.department}`;
+                existingData[key] = formData;
+                localStorage.setItem("formEntries", JSON.stringify(existingData));
 
-            //  Retrieve existing entries from localStorage (if any)
-            let existingData = JSON.parse(localStorage.getItem("formEntries")) || {};
+                alert("Form data saved locally!");
+                $("#form1")[0].reset();
+				populateTable();
+            });
 
-            //  Save or update the entry in localStorage
-            existingData[key] = formData;
-            localStorage.setItem("formEntries", JSON.stringify(existingData));
+            // Update record if it exists
+            $("#updateFormBtn").on("click", function () {
+                const formData = {
+                    firstName: $("#firstName").val(),
+                    middleName: $("#middleName").val(),
+                    lastName: $("#lastName").val(),
+                    Relation:$("#relation").val(),
+                    RelativeFirstName: $("#relFirstName").val(),
+                    RelativeLastName: $("#relLastName").val(),
+                    cnic: $("#cnic").val(),
+                    cellNumber: $("#cellNumber").val(),
+                    cellOwner: $("#cellOwner").val(),
+                    dob: $("#DOB").val(),
+                    department: $("#department").val()
+                };
 
-            alert("Form data saved locally!");
+                const key = `${formData.cnic}`;
+                let existingData = JSON.parse(localStorage.getItem("formEntries")) || {};
 
-            //  Reset the form after saving
-            $("#form1")[0].reset();
+                if (!existingData[key]) {
+                    alert("Record not found. Use Submit form to add it.");
+                    return;
+                }
+
+                existingData[key] = formData;
+                localStorage.setItem("formEntries", JSON.stringify(existingData));
+
+                alert("Record updated successfully!");
+                $("#form1")[0].reset();
+            });
+
+                    $(document).on("click", ".edit-btn", function () {
+            const key = $(this).data("key");
+            const data = JSON.parse(localStorage.getItem("formEntries"))[key];
+
+            $("#firstName").val(data.firstName);
+            $("#middleName").val(data.middleName);
+            $("#lastName").val(data.lastName);
+			$("#relation").val(data.Relation);
+			$("#relFirstName").val(data.RelativeFirstName);
+			$("#relLastName").val(data.RelativeLastName);
+            $("#cnic").val(data.cnic);
+            $("#cellNumber").val(data.cellNumber);
+            $("#cellOwner").val(data.cellOwner);
+            $("#DOB").val(data.dob);
+            $("#department").val(data.department);
+
+            calculateAgeFromDOB(data.dob);
         });
 
-        //  Download stored data as JSON file
-        $("#downloadJsonBtn").on("click", function () {
-            // 📤 Get stored entries from localStorage
+        $(document).on("click", ".delete-btn", function () {
+            const key = $(this).data("key");
+            let entries = JSON.parse(localStorage.getItem("formEntries"));
+            delete entries[key];
+            localStorage.setItem("formEntries", JSON.stringify(entries));
+            populateTable();
+        });
+
+
+
+
+
+
+
+
+
+
+
+            // Download JSON
+            $("#downloadJsonBtn").on("click", function () {
+                const entries = JSON.parse(localStorage.getItem("formEntries")) || {};
+
+                if (Object.keys(entries).length === 0) {
+                    alert("No data available to download.");
+                    return;
+                }
+
+                const blob = new Blob([JSON.stringify(entries, null, 2)], { type: "application/json" });
+                const url = URL.createObjectURL(blob);
+
+                const a = document.createElement("a");
+                a.href = url;
+                a.download = "form-entries.json";
+                a.click();
+
+                URL.revokeObjectURL(url);
+            });
+
+
+
+			// Load existing entries into the table
+                    function populateTable() {
             const entries = JSON.parse(localStorage.getItem("formEntries")) || {};
+            let rows = "";
 
-            //  If no data exists, show message and stop
-            if (Object.keys(entries).length === 0) {
-                alert("No data available to download.");
-                return;
-            }
+            Object.entries(entries).forEach(([key, data], index) => {
+                rows += `
+                    <tr>
+                        <td>${index + 1 }</td>
+                        <td>${data.firstName}</td>
+                        <td>${data.lastName}</td>
+                        <td>${data.cnic}</td>
+                        <td>${data.department}</td>
+                        <td>${data.dob}</td>
+                        <td>${data.cellNumber}</td>
+                        <td>
+                            <button class="btn btn-sm btn-dark edit-btn" data-key="${key}">Edit</button>
+                            <button class="btn btn-sm btn-danger delete-btn" data-key="${key}">Delete</button>
+                        </td>
+                    </tr>
+                `;
+            });
 
-            //  Create a downloadable JSON file
-            const blob = new Blob([JSON.stringify(entries, null, 2)], { type: "application/json" });
-            const url = URL.createObjectURL(blob);
+            $("#formEntriesTableBody").html(rows);
+        }
 
-            //  Trigger file download
-            const a = document.createElement("a");
-            a.href = url;
-            a.download = "form-entries.json";
-            a.click();
-
-            //  Clean up object URL
-            URL.revokeObjectURL(url);
-        });
+                  // Call it on load
+              populateTable();
 
         });
     </script>
